@@ -1,0 +1,3 @@
+[submodule ".\\dependencies\\my-logger"]
+	path = .\\dependencies\\my-logger
+	url = https://github.com/ACking-you/my-logger.git
