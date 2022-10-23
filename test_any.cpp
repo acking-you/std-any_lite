@@ -1,5 +1,6 @@
 #include "Logger.h"
 #include "any.hpp"
+#include <iostream>
 #include <string>
 #include <vector>
 using namespace nonstd;
@@ -48,12 +49,7 @@ void test_any()
 		t = "你好"; //const修饰的常量转变量出错
 		info("{}",any_cast<char*>(t));
 	};
-
 	test_construct();
 	test_cast();
 	test_other();
-}
-int main()
-{
-	test_any();
 }

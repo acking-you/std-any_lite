@@ -45,17 +45,18 @@ namespace nonstd
 				: data_(std::move(data))
 			{
 			}
+
 			template<class... Args>
 			explicit type_impl(Args&&... args)
 				: data_(std::forward<Args>(args)...)
 			{
 			}
 
-			const std::type_info& get_type() const override
+			auto get_type() const  -> const std::type_info& override
 			{
 				return typeid(T);
 			}
-			std::unique_ptr<type_internal> clone() const override
+			auto clone() const -> std::unique_ptr<type_internal> override
 			{
 				return std::unique_ptr<type_impl>(new type_impl(data_));
 			}
@@ -93,14 +94,14 @@ namespace nonstd
 		using decay = typename std::decay<T>::type;
 		template<class T, typename std::enable_if<!std::is_same<decay<T>, any>::value, bool>::type = true>
 		any(T&& data)
-			: m_data(new type_impl<decay<T>>(std::forward<decay<T>>(data)))
+			: m_data(new type_impl<decay<T>>(std::forward<T>( data)))
 		{
 		}
 
 		template<class T, typename std::enable_if<!std::is_same<decay<T>, any>::value, bool>::type = true>
 		auto operator=(T&& data) -> any&
 		{
-			m_data.reset(new type_impl<decay<T>>(std::forward<decay<T>>(data)));
+			m_data.reset(new type_impl<decay<T>>(std::forward<T>(data)));
 			return *this;
 		}
 
