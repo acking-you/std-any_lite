@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Logger.h"
 #include <memory>
 #include <typeinfo>
+#include <cstdio>
 
 namespace nonstd
 {
@@ -100,7 +100,7 @@ namespace nonstd
 		template<class T, typename std::enable_if<!std::is_same<decay<T>, any>::value, bool>::type = true>
 		auto operator=(T&& data) -> any&
 		{
-			m_data = std::make_unique<type_impl<decay<T>>>(std::forward<decay<T>>(data));
+			m_data.reset(new type_impl<decay<T>>(std::forward<decay<T>>(data)));
 			return *this;
 		}
 
@@ -127,7 +127,7 @@ namespace nonstd
 		template<class T, class... Args>
 		void emplace(Args&&... args)
 		{
-			m_data = std::make_unique<type_impl<T>>(std::forward<Args>(args)...);
+			m_data.reset(new type_impl<decay<T>>(std::forward<Args>(args)...));
 		}
 
 		template<class T>
@@ -152,7 +152,7 @@ namespace nonstd
 		{
 			if (type().hash_code() != typeid(T).hash_code())
 			{
-				error("{} => {} error:", type().name(), typeid(T).name());
+				fprintf(stderr,"in file %s:%d\n%s => %s type cast error!\n", __FILE__,__LINE__,type().name(), typeid(T).name());
 				return false;
 			}
 			return true;
@@ -162,7 +162,7 @@ namespace nonstd
 		{
 			if (!m_data)
 			{
-				error("nullptr data");
+				fprintf(stderr,"in file %s:%d\n nullptr data",__FILE__,__LINE__);
 				return false;
 			}
 			return true;
@@ -175,6 +175,7 @@ namespace nonstd
 	{
 		lhs.swap(rhs);
 	}
+
 	template<class T>
 	auto any_cast(const any& any) -> const T&
 	{
@@ -186,4 +187,5 @@ namespace nonstd
 	{
 		return any.template cast<T>();
 	}
+
 }// namespace nonstd

@@ -1,8 +1,11 @@
-#include <iostream>
-#include "simple_any.hpp"
+#include "Logger.h"
+#include "any.hpp"
+#include <string>
+#include <vector>
 using namespace nonstd;
+using namespace lblog;
 
-struct Student : public copyable {
+struct Student {
 	Student() = default;
 	Student(int id, std::string name)
 		: id_(id), name_(std::move(name))
@@ -29,17 +32,21 @@ void test_any()
 	auto test_cast = [&]() {
 		info("{}", any_cast<const char*>(t));
 		t = std::to_string(43324324);
-		info("typename:{} value:{}", t.type().name(), t.cast<std::string>());
+		info("typename:{} value:{}", t.type().name(), any_cast<std::string>(t));
 	};
 
 	auto test_other = [&]() {
 		t.emplace<Student>(323, std::string("fdfsafsda"));
-		info("id:{} name:{}", t.cast<Student>().id_, t.cast<Student>().name_);
+		info("id:{} name:{}", any_cast<Student>(t).id_, any_cast<Student>(t).name_);
 		t.reset();
 		info("{}", t.type().name());
 		any p = "再次测试看看";
 		swap(t, p);
-		info("p:{},t:{},t_value{}", p.type().name(), t.type().name(), t.cast<const char*>());
+		info("p:{},t:{},t_value{}", p.type().name(), t.type().name(), any_cast<const char*>(t));
+		t = std::vector<std::string>{"fdsfasddfas", "fsaffafa", "fdsaadsf"};
+		info("type:{} t: {}", t.type().name(), any_cast<std::vector<std::string>>(t));
+		t = "你好"; //const修饰的常量转变量出错
+		info("{}",any_cast<char*>(t));
 	};
 
 	test_construct();
